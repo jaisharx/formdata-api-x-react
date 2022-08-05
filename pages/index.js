@@ -7,6 +7,7 @@ import {
   Heading,
   HStack,
   Input,
+  Select,
   Text,
   useToast,
   VStack,
@@ -25,13 +26,16 @@ export default function FormPage() {
 
     setFormData(inputObject)
 
-    // const urlParam = new URLSearchParams(inputObject)
-    // const res = await fetch('/api/form?' + urlParam)
-
-    const res = await fetch('/api/form', {
-      method: 'POST',
-      body: JSON.stringify(inputObject),
-    })
+    let res = ''
+    if (inputObject['request-type'] === 'GET') {
+      const urlParam = new URLSearchParams(inputObject)
+      res = await fetch('/api/form?' + urlParam)
+    } else {
+      res = await fetch('/api/form', {
+        method: 'POST',
+        body: JSON.stringify(inputObject),
+      })
+    }
 
     res.text().then((data) =>
       toast({
@@ -60,15 +64,25 @@ export default function FormPage() {
           onSubmit={onSubmitHandler}
         >
           <FormControl>
+            <FormLabel>Request Type</FormLabel>
+            <Select isRequired name="request-type" placeholder="Select option">
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+            </Select>
+          </FormControl>
+
+          <FormControl>
             <FormLabel>Email address</FormLabel>
             <Input name="email" type="email" isRequired />
             <FormHelperText>We'll never share your email.</FormHelperText>
           </FormControl>
+
           <FormControl>
             <FormLabel>Password</FormLabel>
             <Input name="password" type="password" isRequired />
             <FormHelperText>We'll never share your password.</FormHelperText>
           </FormControl>
+
           <FormControl>
             <FormLabel>Phone Number</FormLabel>
             <Input name="tel" type="tel" isRequired />
@@ -77,7 +91,6 @@ export default function FormPage() {
             </FormHelperText>
           </FormControl>
 
-          <Box h="2" />
           <FormControl>
             <HStack justify="flex-end">
               <Button type="submit" colorScheme="blue">
